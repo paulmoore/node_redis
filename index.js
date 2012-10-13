@@ -1068,7 +1068,12 @@ RedisClient.prototype.eval = RedisClient.prototype.EVAL = function () {
     var self = this,
         args = to_array(arguments),
         callback;
-
+	
+	// Paul Moore - FIX: Allow call to this function with all arguments in a single array.
+	if (Array.isArray(args[0])) {
+		args = args[0];
+	}
+		
     if (typeof args[args.length - 1] === "function") {
         callback = args.pop();
     }
