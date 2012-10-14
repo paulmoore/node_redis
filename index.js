@@ -1062,6 +1062,7 @@ RedisClient.prototype.MULTI = function (args) {
 
 
 // stash original eval method
+/* Paul Moore - Disabling this altogether for now.
 var eval_orig = RedisClient.prototype.eval;
 // hook eval with an attempt to evalsha for cached scripts
 RedisClient.prototype.eval = RedisClient.prototype.EVAL = function () {
@@ -1092,6 +1093,7 @@ RedisClient.prototype.eval = RedisClient.prototype.EVAL = function () {
         }
     });
 };
+*/
 
 
 exports.createClient = function (port_arg, host_arg, options) {
