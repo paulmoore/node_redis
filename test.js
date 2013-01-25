@@ -591,27 +591,35 @@ tests.HMGET = function () {
     }, require_string("OK", name));
 
     client.HMGET(key1, "0123456789", "some manner of key", function (err, reply) {
-        assert.strictEqual("abcdefghij", reply[0].toString(), name);
-        assert.strictEqual("a type of value", reply[1].toString(), name);
+        assert.strictEqual("object", typeof reply, name);
+        assert.strictEqual(2, Object.keys(reply).length, name);
+        assert.strictEqual("abcdefghij", reply["0123456789"].toString(), name);
+        assert.strictEqual("a type of value", reply["some manner of key"].toString(), name);
     });
 
     client.HMGET(key2, "0123456789", "some manner of key", function (err, reply) {
-        assert.strictEqual("abcdefghij", reply[0].toString(), name);
-        assert.strictEqual("a type of value", reply[1].toString(), name);
+        assert.strictEqual("object", typeof reply, name);
+        assert.strictEqual(2, Object.keys(reply).length, name);
+        assert.strictEqual("abcdefghij", reply["0123456789"].toString(), name);
+        assert.strictEqual("a type of value", reply["some manner of key"].toString(), name);
     });
 
     client.HMGET(key1, ["0123456789"], function (err, reply) {
-        assert.strictEqual("abcdefghij", reply[0], name);
+        assert.strictEqual("object", typeof reply, name);
+        assert.strictEqual(1, Object.keys(reply).length, name);
+        assert.strictEqual("abcdefghij", reply["0123456789"], name);
     });
 
     client.HMGET(key1, ["0123456789", "some manner of key"], function (err, reply) {
-        assert.strictEqual("abcdefghij", reply[0], name);
-        assert.strictEqual("a type of value", reply[1], name);
+        assert.strictEqual("object", typeof reply, name);
+        assert.strictEqual(2, Object.keys(reply).length, name);
+        assert.strictEqual("abcdefghij", reply["0123456789"], name);
+        assert.strictEqual("a type of value", reply["some manner of key"], name);
     });
 
     client.HMGET(key1, "missing thing", "another missing thing", function (err, reply) {
-        assert.strictEqual(null, reply[0], name);
-        assert.strictEqual(null, reply[1], name);
+        assert.strictEqual(null, reply["0123456789"], name);
+        assert.strictEqual(null, reply["some manner of key"], name);
         next(name);
     });
 };

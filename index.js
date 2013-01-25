@@ -525,7 +525,7 @@ function try_callback(callback, reply) {
     }
 }
 
-// hgetall converts its replies to an Object.  If the reply is empty, null is returned.
+// hgetall and hmget convert their replies to an Object.  If the reply is empty, null is returned.
 function reply_to_object(reply) {
     var obj = {}, j, jl, key, val;
 
@@ -560,7 +560,7 @@ function reply_to_strings(reply) {
 }
 
 RedisClient.prototype.return_reply = function (reply) {
-    var command_obj, len, type, timestamp, argindex, args, queue_len;
+    var command_obj, len, type, timestamp, argindex, args, queue_len, lcaseCmd;
 
     command_obj = this.command_queue.shift(),
     queue_len   = this.command_queue.getLength();
@@ -582,9 +582,12 @@ RedisClient.prototype.return_reply = function (reply) {
                 reply = reply_to_strings(reply);
             }
 
-            // TODO - confusing and error-prone that hgetall is special cased in two places
-            if (reply && 'hgetall' === command_obj.command.toLowerCase()) {
-                reply = reply_to_object(reply);
+            // TODO - confusing and error-prone that hgetall and hmget special cased in two places
+            if (reply) {
+                lcaseCmd = command_obj.command.toLowerCase();
+                if ('hgetall' === lcaseCmd || 'hmget' === lcaseCmd) {
+                    reply = reply_to_object(reply);
+                }
             }
 
             try_callback(command_obj.callback, reply);
@@ -1029,16 +1032,19 @@ Multi.prototype.exec = function (callback) {
             }
         }
 
-        var i, il, reply, args;
+        var i, il, reply, args, lcaseCmd;
 
         if (replies) {
             for (i = 1, il = self.queue.length; i < il; i += 1) {
                 reply = replies[i - 1];
                 args = self.queue[i];
 
-                // TODO - confusing and error-prone that hgetall is special cased in two places
-                if (reply && args[0].toLowerCase() === "hgetall") {
-                    replies[i - 1] = reply = reply_to_object(reply);
+                // TODO - confusing and error-prone that hgetall and hmget are special cased in two places
+                if (reply) {
+                    lcaseCmd = args[0].toLowerCase();
+                    if ('hgetall' === lcaseCmd || 'hmget' === lcaseCmd) {
+                        replies[i - 1] = reply = reply_to_object(reply);
+                    }
                 }
 
                 if (typeof args[args.length - 1] === "function") {
